@@ -16,8 +16,9 @@ class MyTrainer:
             't5-small': T5Small
         }
         model_name = self.configs['model']['name']
+        pretrained_model = self.configs['model']['pretrained']
         model_configs = self.configs['model'].get('configs', None)
-        return model_dict[model_name](model_configs)
+        return model_dict[model_name](pretrained_model, model_configs)
 
     def get_dataloaders(self, tokenizer):
         dataset_dir = self.configs['dataset']['dir']

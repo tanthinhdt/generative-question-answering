@@ -1,6 +1,7 @@
 {
     "model": {
-        "name": "bart-base"
+        "name": "bart-base",
+        "pretrained": "facebook/bart-base"
     },
     "dataset": {
         "dir": "data/ELI5",

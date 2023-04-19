@@ -1,6 +1,7 @@
 {
     "model": {
-        "name": "t5-small"
+        "name": "t5-small",
+        "pretrained": "t5-small"
     },
     "dataset": {
         "dir": "data/ELI5",
