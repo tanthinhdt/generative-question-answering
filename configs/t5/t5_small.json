@@ -1,0 +1,35 @@
+{
+    "model": {
+        "name": "t5_small",
+        "configs": null
+    },
+    "dataset": {
+        "dir": "data/ELI5",
+        "tokenizer_configs": {
+
+        }
+    },
+    "train": {
+        "output_dir": "checkpoints/t5/t5_small",
+        "overwrite_output_dir": true,
+        "do_train": true,
+        "do_eval": true,
+        "do_predict": false,
+        "evaluate_strategy": "steps",
+        "per_device_train_batch_size": 16,
+        "per_device_eval_batch_size": 16,
+        "learning_rate": 2e-5,
+        "num_train_epochs": 3,
+        "max_steps": 5000,
+        "weight_decay": 0.01,
+        "logging_dir": "logs/t5/t5_small",
+        "logging_strategy": "steps",
+        "logging_steps": 100,
+        "save_strategy": "steps",
+        "save_steps": 500,
+        "save_total_limit": 5,
+        "run_name": "generative-question-answering",
+        "report_to": "wandb",
+        "auto_find_batch_size": true
+    }
+}
