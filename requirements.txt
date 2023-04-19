@@ -2,3 +2,4 @@ transformers
 accelerate
 datasets
 jaxlib
+sentencepiece
