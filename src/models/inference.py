@@ -1,15 +1,5 @@
-import argparse
 from models.bart.bart_base import BartBase
 from models.t5.t5_small import T5Small
-
-
-def get_args():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--configs', '-c', type=str, required=True,
-                        help='Path to the config file')
-    parser.add_argument('--question', '-q', type=str, required=True,
-                        help='Question to be asked')
-    return parser.parse_args()
 
 
 class Inference():
@@ -29,13 +19,3 @@ class Inference():
 
     def infer(self, question):
         return self.model.generate(question)
-
-
-if __name__ == '__main__':
-    args = get_args()
-
-    configs = args.configs
-    question = args.question
-
-    inference = Inference(configs)
-    print(inference.infer(question))

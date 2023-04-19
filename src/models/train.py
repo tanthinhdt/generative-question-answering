@@ -1,18 +1,7 @@
-import argparse
-import json
-import sys
-sys.path.append('D:\\Projects\\generative-question-answering\\')
 from models.bart.bart_base import BartBase
 from models.t5.t5_small import T5Small
 from src.data.dataset import Dataset
 from transformers import TrainingArguments, Trainer
-
-
-def get_args():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--configs_path', '-c', type=str, required=True,
-                        help='Path to the config file')
-    return parser.parse_args()
 
 
 class MyTrainer:
@@ -46,15 +35,3 @@ class MyTrainer:
             tokenizer=self.tokenizer
         )
         trainer.train()
-
-
-if __name__ == '__main__':
-    args = get_args()
-
-    configs_path = args.configs_path
-
-    with open(configs_path, 'r') as f:
-        configs = json.load(f)
-
-    trainer = MyTrainer(configs)
-    trainer.train()
