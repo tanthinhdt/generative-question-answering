@@ -7,7 +7,7 @@ def get_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--configs_path', '-c', type=str, required=True,
                         help='Path to the config file')
-    parser.add_argument('--question', '-q', type=str, required=True,
+    parser.add_argument('--question', '-q', type=str,
                         help='Question to be asked')
     return parser.parse_args()
 
