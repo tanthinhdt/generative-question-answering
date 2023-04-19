@@ -1,16 +1,18 @@
 {
     "model": {
-        "name": "t5_small",
-        "configs": null
+        "name": "bart-base"
     },
     "dataset": {
         "dir": "data/ELI5",
         "tokenizer_configs": {
-
+            "max_length": 384,
+            "truncation": "only_second",
+            "return_offsets_mapping": true,
+            "padding": "max_length"
         }
     },
     "train": {
-        "output_dir": "checkpoints/t5/t5_small",
+        "output_dir": "checkpoints/bart/bart_base",
         "overwrite_output_dir": true,
         "do_train": true,
         "do_eval": true,
@@ -22,7 +24,7 @@
         "num_train_epochs": 3,
         "max_steps": 5000,
         "weight_decay": 0.01,
-        "logging_dir": "logs/t5/t5_small",
+        "logging_dir": "logs/bart/bart_base",
         "logging_strategy": "steps",
         "logging_steps": 100,
         "save_strategy": "steps",

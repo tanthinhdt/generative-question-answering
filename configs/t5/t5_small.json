@@ -1,12 +1,14 @@
 {
     "model": {
-        "name": "t5_small",
-        "configs": null
+        "name": "t5-small"
     },
     "dataset": {
         "dir": "data/ELI5",
         "tokenizer_configs": {
-
+            "max_length": 384,
+            "truncation": "only_second",
+            "return_offsets_mapping": true,
+            "padding": "max_length"
         }
     },
     "train": {
