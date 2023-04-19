@@ -19,12 +19,12 @@ class Dataset:
             }
         self.tokenizer_configs = tokenizer_configs
 
-    def get_dataset(self):
+    def get_datasets(self):
         dataset_dict = {
             'ELI5': ELI5
         }
         dataset_name = os.path.basename(self.dataset_dir)
-        dataset = dataset_dict[dataset_name](self.dataset_dir)
+        dataset = dataset_dict[dataset_name](self.dataset_dir)()
 
         train_set = dataset['train'].map(
             self.__preprocess_train_set,

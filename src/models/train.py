@@ -8,7 +8,7 @@ class MyTrainer:
     def __init__(self, configs) -> None:
         self.configs = configs
         self.tokenizer, self.model = self.get_tokenizer_and_model()
-        self.train_set, self.val_set = self.get_dataloaders(self.tokenizer)
+        self.train_set, self.val_set = self.get_datasets(self.tokenizer)
 
     def get_tokenizer_and_model(self):
         model_dict = {
@@ -18,13 +18,13 @@ class MyTrainer:
         model_name = self.configs['model']['name']
         pretrained_model = self.configs['model']['pretrained']
         model_configs = self.configs['model'].get('configs', None)
-        return model_dict[model_name](pretrained_model, model_configs)
+        return model_dict[model_name](pretrained_model, model_configs)()
 
-    def get_dataloaders(self, tokenizer):
+    def get_datasets(self, tokenizer):
         dataset_dir = self.configs['dataset']['dir']
         tokenizer_configs = self.configs['dataset']['tokenizer_configs']
         dataset = Dataset(dataset_dir, tokenizer, **tokenizer_configs)
-        return dataset.get_dataloaders()
+        return dataset.get_datasets()
 
     def train(self):
         train_args = TrainingArguments(**self.configs['train'])
