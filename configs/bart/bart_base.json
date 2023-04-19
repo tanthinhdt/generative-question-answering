@@ -8,8 +8,10 @@
         "tokenizer_configs": {
             "max_length": 384,
             "truncation": "only_second",
+            "stride": 128,
+            "return_overflowing_tokens": true,
             "return_offsets_mapping": true,
-            "padding": "max_length"
+            "padding": 384
         }
     },
     "train": {
