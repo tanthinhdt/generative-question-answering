@@ -12,8 +12,8 @@ class MyTrainer:
 
     def get_tokenizer_and_model(self):
         model_dict = {
-            'bart_base': BartBase,
-            't5_small': T5Small
+            'bart-base': BartBase,
+            't5-small': T5Small
         }
         model_name = self.configs['model']['name']
         model_configs = self.configs['model'].get('configs', None)
