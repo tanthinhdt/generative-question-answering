@@ -1,4 +1,5 @@
 import argparse
+import json
 from src import MyTrainer
 from src import Inference
 
@@ -7,7 +8,7 @@ def get_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--configs_path', '-c', type=str, required=True,
                         help='Path to the config file')
-    parser.add_argument('--question', '-q', type=str,
+    parser.add_argument('--question', '-q', type=str, default=None,
                         help='Question to be asked')
     return parser.parse_args()
 
