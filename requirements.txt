@@ -3,3 +3,7 @@ accelerate
 datasets
 jaxlib
 sentencepiece
+rouge_score
+evaluate
+psycopg2
+tqdm

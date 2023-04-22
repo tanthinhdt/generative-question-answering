@@ -4,7 +4,7 @@ from src import MyTrainer
 from src import Inference
 
 
-def get_args():
+def get_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument('--configs_path', '-c', type=str, required=True,
                         help='Path to the config file')
@@ -14,10 +14,13 @@ def get_args():
 
 
 if __name__ == '__main__':
-    args = get_args()
+    # args = get_args()
 
-    configs_path = args.configs_path
-    question = args.question
+    # configs_path = args.configs_path
+    # question = args.question
+
+    configs_path = 'configs/t5/t5_small.json'
+    question = None
 
     with open(configs_path, 'r') as f:
         configs = json.load(f)
