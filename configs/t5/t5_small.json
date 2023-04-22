@@ -12,26 +12,26 @@
         "dir": "data/ELI5"
     },
     "train": {
-        "output_dir": "checkpoints/t5/t5_small",
-        "overwrite_output_dir": true,
         "do_train": true,
-        "do_eval": true,
-        "evaluation_strategy": "steps",
-        "per_device_train_batch_size": 16,
-        "per_device_eval_batch_size": 16,
+        "include_inputs_for_metrics": true,
+        "per_device_train_batch_size": 2,
+        "per_device_eval_batch_size": 2,
+        "auto_find_batch_size": true,
         "learning_rate": 3e-4,
         "num_train_epochs": 3,
         "max_steps": 5000,
-        "weight_decay": 0.01,
+        "weight_decay": 0.005,
         "logging_dir": "logs/t5/t5_small",
         "logging_strategy": "steps",
         "logging_steps": 100,
+        "output_dir": "checkpoints/t5/t5_small",
+        "overwrite_output_dir": true,
         "save_strategy": "steps",
         "save_steps": 500,
         "save_total_limit": 5,
         "run_name": "generative-question-answering",
         "report_to": "wandb",
-        "auto_find_batch_size": true
+        "gradient_checkpointing": true
     },
     "knowledge": {
         "configs_path": "configs/knowledge.json"

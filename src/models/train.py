@@ -37,11 +37,10 @@ class MyTrainer:
         trainer = Trainer(
             model=self.model,
             args=train_args,
-            train_dataset=self.train_set,
-            eval_dataset=self.val_set,
-            compute_metrics=self.compute_metrics
+            train_dataset=self.train_set
         )
         trainer.train()
+        trainer.evaluate()
 
     def compute_metrics(self, eval_pred):
         inference, answer = eval_pred
