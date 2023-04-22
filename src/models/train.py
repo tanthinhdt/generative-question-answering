@@ -49,4 +49,6 @@ class MyTrainer:
                                     references=answer,
                                     rouge_type=['rouge_L'],
                                     use_aggregator=True)
-        return rouge['rougeL']
+        return {
+            'Rouge-L': rouge['rougeL']
+        }
