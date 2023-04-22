@@ -37,7 +37,9 @@ class MyTrainer:
         trainer = Trainer(
             model=self.model,
             args=train_args,
-            train_dataset=self.train_set
+            train_dataset=self.train_set,
+            eval_dataset=self.val_set,
+            compute_metrics=self.compute_metrics
         )
         trainer.train()
         trainer.evaluate()
