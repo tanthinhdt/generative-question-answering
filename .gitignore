@@ -131,3 +131,7 @@ dmypy.json
 .pyre/
 
 tutorials/
+wandb/
+
+# test files
+test*
