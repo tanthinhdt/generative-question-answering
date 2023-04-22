@@ -3,27 +3,23 @@
         "name": "t5-small",
         "pretrained": "t5-small"
     },
+    "tokenizer": {
+        "truncation": true,
+        "padding": "max_length",
+        "return_tensors": "pt"
+    },
     "dataset": {
-        "dir": "data/ELI5",
-        "tokenizer_configs": {
-            "max_length": 384,
-            "truncation": "only_second",
-            "stride": 128,
-            "return_overflowing_tokens": true,
-            "return_offsets_mapping": true,
-            "padding": 384
-        }
+        "dir": "data/ELI5"
     },
     "train": {
         "output_dir": "checkpoints/t5/t5_small",
         "overwrite_output_dir": true,
         "do_train": true,
         "do_eval": true,
-        "do_predict": false,
-        "evaluate_strategy": "steps",
+        "evaluation_strategy": "steps",
         "per_device_train_batch_size": 16,
         "per_device_eval_batch_size": 16,
-        "learning_rate": 2e-5,
+        "learning_rate": 3e-4,
         "num_train_epochs": 3,
         "max_steps": 5000,
         "weight_decay": 0.01,
@@ -36,5 +32,8 @@
         "run_name": "generative-question-answering",
         "report_to": "wandb",
         "auto_find_batch_size": true
+    },
+    "knowledge": {
+        "configs_path": "configs/knowledge.json"
     }
 }

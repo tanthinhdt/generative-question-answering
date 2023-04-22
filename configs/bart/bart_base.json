@@ -6,12 +6,16 @@
     "dataset": {
         "dir": "data/ELI5",
         "tokenizer_configs": {
-            "max_length": 384,
-            "truncation": "only_second",
-            "stride": 128,
-            "return_overflowing_tokens": true,
-            "return_offsets_mapping": true,
-            "padding": 384
+            "encoder": {
+                "max_length": 250,
+                "truncation": true,
+                "pad_to_max_length": true
+            },
+            "decoder": {
+                "max_length": 250,
+                "truncation": true,
+                "pad_to_max_length": true
+            }
         }
     },
     "train": {
@@ -20,7 +24,7 @@
         "do_train": true,
         "do_eval": true,
         "do_predict": false,
-        "evaluate_strategy": "steps",
+        "evaluation_strategy": "steps",
         "per_device_train_batch_size": 16,
         "per_device_eval_batch_size": 16,
         "learning_rate": 2e-5,
@@ -36,5 +40,8 @@
         "run_name": "generative-question-answering",
         "report_to": "wandb",
         "auto_find_batch_size": true
+    },
+    "knowledge": {
+        "configs_path": "configs/knowledge.json"
     }
 }
