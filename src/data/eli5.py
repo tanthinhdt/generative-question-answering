@@ -6,7 +6,7 @@ class ELI5:
     def __init__(self, dataset_dir):
         self.data_files = {
             'train': os.path.join(dataset_dir, 'train.jsonl'),
-            'test': os.path.join(dataset_dir, 'val.jsonl')
+            'val': os.path.join(dataset_dir, 'val.jsonl')
         }
 
     def __call__(self):
