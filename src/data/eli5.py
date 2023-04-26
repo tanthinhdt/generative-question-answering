@@ -10,4 +10,14 @@ class ELI5:
         }
 
     def __call__(self):
-        return load_dataset('json', data_files=self.data_files, streaming=True)
+        dataset = load_dataset('json', data_files=self.data_files,
+                               streaming=True, keep_in_memory=False)
+        dataset['val'] = dataset['val'].map(self.__tailor_val_set)
+        return dataset
+
+    def __tailor_val_set(self, sample: dict):
+        new_ctxs = []
+        for ctx in sample['ctxs']:
+            new_ctxs.append(ctx[0])
+        sample['ctxs'] = new_ctxs
+        return sample
