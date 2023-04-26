@@ -81,7 +81,11 @@ class Trainer:
         for _ in range(num_epochs):
             for batch in train_loader:
                 batch = {k: v.to(self.device) for k, v in batch.items()}
-                outputs = self.model(**batch)
+                outputs = self.model(
+                    input_ids=batch['input_ids'],
+                    attention_mask=batch['attention_mask'],
+                    decoder_input_ids=batch['labels']
+                )
                 loss = outputs.loss
                 loss.backward()
 
@@ -105,7 +109,7 @@ class Trainer:
         for batch in eval_loader:
             batch = {k: v.to(self.device) for k, v in batch.items()}
             with torch.no_grad():
-                outputs = self.model(**batch)
+                outputs = self.model.generate(input_ids=batch['input_ids'])
 
             inferences = self.tokenizer.decode(outputs[0],
                                                skip_special_tokens=True)
@@ -114,7 +118,7 @@ class Trainer:
                              references=answers)
         return metric.compute
 
-    def from_checkpoint(self):
+    def load_checkpoint(self):
         model_checkpoint_path = self.configs['checpoints']['model']
         self.model.load_state_dict(torch.load(model_checkpoint_path))
 

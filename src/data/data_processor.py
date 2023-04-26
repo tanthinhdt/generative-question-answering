@@ -1,4 +1,5 @@
 import os
+import torch
 from src.data.eli5 import ELI5
 from src.utils import remove_redundant_spaces
 from transformers import DefaultDataCollator
@@ -7,6 +8,9 @@ from torch.utils.data import DataLoader
 
 class DataProcessor:
     def __init__(self, tokenizer_info: dict, dataset_dir: str = None):
+        self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
+        self.device = torch.device(self.device)
+
         self.tokenizer = tokenizer_info['tokenizer']
         self.tokenizer_configs = tokenizer_info['configs']
         self.dataset_dir = dataset_dir
@@ -36,7 +40,8 @@ class DataProcessor:
     def get_eval_set(self):
         eval_set = self.dataset['val'].map(
             self.__process_sample,
-            remove_columns=['question_id', 'question', 'ctxs']
+            remove_columns=['question_id', 'question', 'ctxs',
+                            'attention_mask', 'labels']
         )
         return eval_set
 
