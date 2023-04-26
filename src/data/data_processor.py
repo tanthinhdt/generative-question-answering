@@ -1,49 +1,55 @@
 import os
 from src.data.eli5 import ELI5
 from src.utils import remove_redundant_spaces
+from transformers import DefaultDataCollator
+from torch.utils.data import DataLoader
 
 
 class DataProcessor:
-    def __init__(self, tokenizer_info, dataset_dir: str = None):
+    def __init__(self, tokenizer_info: dict, dataset_dir: str = None):
         self.tokenizer = tokenizer_info['tokenizer']
         self.tokenizer_configs = tokenizer_info['configs']
         self.dataset_dir = dataset_dir
+        self.dataset = self.get_dataset()
 
-    def get_datasets(self):
+    def get_dataset(self):
         dataset_dict = {
             'ELI5': ELI5
         }
         dataset_name = os.path.basename(self.dataset_dir)
-        dataset = dataset_dict[dataset_name](self.dataset_dir)()
+        return dataset_dict[dataset_name](self.dataset_dir)()
 
-        train_set = dataset['train'].map(
-            self.__process_train_sample,
-            remove_columns=dataset['train'].column_names
+    def get_train_set(self):
+        train_set = self.dataset['train'].map(
+            self.__process_sample,
+            remove_columns=['question_id', 'question', 'ctxs', 'answers']
         )
+        return train_set
 
-        val_set = dataset['val'].map(
-            self.__process_val_sample,
-            remove_columns=dataset['val'].column_names
+    def get_train_loader(self, batch_size: int):
+        train_set = self.get_train_set()
+        train_loader = DataLoader(train_set,
+                                  batch_size=batch_size,
+                                  collate_fn=DefaultDataCollator())
+        return train_loader
+
+    def get_eval_set(self):
+        eval_set = self.dataset['val'].map(
+            self.__process_sample,
+            remove_columns=['question_id', 'question', 'ctxs']
         )
+        return eval_set
 
-        return train_set, val_set
+    def get_eval_loader(self, batch_size: int):
+        eval_set = self.get_eval_set()
+        eval_loader = DataLoader(eval_set,
+                                 batch_size=batch_size,
+                                 collate_fn=DefaultDataCollator())
+        return eval_loader
 
-    def __process_train_sample(self, sample: dict):
+    def __process_sample(self, sample: dict):
         question = remove_redundant_spaces(sample['question'])
         ctxs = ', '.join([remove_redundant_spaces(c) for c in sample['ctxs']])
-        answer = ', '.join([remove_redundant_spaces(a)
-                           for a in sample['answers']])
-
-        question_plus = f'Answer this question: {question}'
-        question_plus += f', with the context: {ctxs}'
-        answer_plus = f'{answer}'
-
-        return self.encode_sample(question_plus, answer_plus)
-
-    def __process_val_sample(self, sample: dict):
-        question = remove_redundant_spaces(sample['question'])
-        ctxs = ', '.join([remove_redundant_spaces(i[0])
-                         for i in sample['ctxs']])
         answer = ', '.join([remove_redundant_spaces(a)
                            for a in sample['answers']])
 
@@ -62,12 +68,15 @@ class DataProcessor:
         attention_mask = encoder_inputs['attention_mask']
 
         decoder_inputs = self.encode(answer)
-        labels = decoder_inputs['input_ids']
+        decoder_input_ids = decoder_inputs['input_ids']
 
-        labels[labels == self.tokenizer.pad_token_id] = -100
+        decoder_input_ids[decoder_input_ids ==
+                          self.tokenizer.pad_token_id] = -100
 
-        return {
+        sample = {
             'input_ids': input_ids.squeeze(0),
             'attention_mask': attention_mask.squeeze(0),
-            'labels': labels.squeeze(0)
+            'decoder_input_ids': decoder_input_ids.squeeze(0)
         }
+
+        return sample
