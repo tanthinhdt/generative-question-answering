@@ -118,13 +118,15 @@ class Trainer:
                 loss += self.model(input_ids=batch['input_ids'],
                                    attention_mask=batch['attention_mask'],
                                    labels=batch['labels']).loss.item()
-                outputs = self.model.generate(input_ids=batch['input_ids'])
+                outputs = self.model.generate(
+                    input_ids=batch['input_ids'],
+                    attention_mask=batch['attention_mask']
+                )
 
-            inferences = self.tokenizer.decode(outputs[0],
-                                               skip_special_tokens=True)
-            answers = batch['answers']
+            inferences = self.tokenizer.batch_decode(outputs,
+                                                     skip_special_tokens=True)
             metric.add_batch(predictions=inferences,
-                             references=answers)
+                             references=batch['answers'])
         eval_results = metric.compute()
         eval_results['loss'] = loss / batch_size
         return eval_results
