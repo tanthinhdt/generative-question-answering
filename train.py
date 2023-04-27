@@ -90,7 +90,6 @@ class Trainer:
                 self.scheduler.step()
                 self.optimizer.zero_grad()
 
-                progress_bar.update(1)
                 if steps != 0 and steps % num_logging_steps == 0:
                     progress_bar.write(f'Logging >> Loss: {loss.item()}')
 
@@ -103,10 +102,12 @@ class Trainer:
                     message += ', '.join(
                         [f'{m}: {v}' for m, v in eval_results.items()])
                     progress_bar.write(message)
+
+                progress_bar.update(1)
                 steps += 1
 
     def evaluate(self):
-        batch_size = self.configs['eval']['batch_size']
+        num_eval_samples = self.configs['data']['num_eval_samples']
         eval_set = self.data_processor.get_eval_set()
         metric = evaluate.load('rouge')
 
@@ -136,7 +137,7 @@ class Trainer:
             metric.add_batch(predictions=inferences,
                              references=[sample['answers']])
         eval_results = metric.compute()
-        eval_results['loss'] = loss / batch_size
+        eval_results['loss'] = loss / num_eval_samples
         return eval_results
 
     def load_checkpoint(self):
