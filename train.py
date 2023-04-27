@@ -92,13 +92,17 @@ class Trainer:
 
                 progress_bar.update(1)
                 if steps != 0 and steps % num_logging_steps == 0:
-                    progress_bar.write(f'Loss: {loss.item()}')
+                    progress_bar.write(f'Logging >> Loss: {loss.item()}')
 
                 if steps != 0 and steps % num_saving_steps == 0:
                     self.save(steps)
 
                 if steps != 0 and steps % num_eval_steps == 0:
-                    self.evaluate()
+                    eval_results = self.evaluate()
+                    message = 'Evaluation >> '
+                    message += ', '.join(
+                        [f'{m}: {v}' for m, v in eval_results.items()])
+                    progress_bar.write(message)
                 steps += 1
 
     def evaluate(self):
