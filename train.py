@@ -156,7 +156,7 @@ class Trainer:
     def load_checkpoint(self):
         entry = self.configs['resume']['entry']
         step = self.configs['resume']['step']
-        checkpoint_dir = self.configs['train']['checkpoint_dir'] + f'/{entry}'
+        checkpoint_dir = self.configs['train']['checkpoint_dir']
 
         model_checkpoint_path = os.path.join(checkpoint_dir, entry,
                                              f'model_{step}.pt')
