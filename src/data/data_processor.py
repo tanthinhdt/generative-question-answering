@@ -38,17 +38,29 @@ class DataProcessor:
         return train_loader
 
     def get_eval_set(self):
-        eval_set = self.dataset['val'].map(
+        eval_set = self.dataset['eval'].map(
             self.__process_sample,
             remove_columns=['question_id', 'question', 'ctxs']
         )
         return eval_set
 
+    def eval_collate_fn(self, batch):
+        input_ids_list = []
+        attention_mask_list = []
+        labels_list = []
+        answers_list = []
+        for sample in batch:
+            input_ids_list.append(sample['input_ids'])
+            attention_mask_list.append(sample['attention_mask'])
+            labels_list.append(sample['labels'])
+            answers_list.append(sample['answers'])
+        return input_ids_list, attention_mask_list, labels_list, answers_list
+
     def get_eval_loader(self, batch_size: int):
         eval_set = self.get_eval_set()
         eval_loader = DataLoader(eval_set,
                                  batch_size=batch_size,
-                                 collate_fn=DefaultDataCollator())
+                                 collate_fn=self.eval_collate_fn)
         return eval_loader
 
     def __process_sample(self, sample: dict):
