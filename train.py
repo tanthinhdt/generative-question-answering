@@ -107,26 +107,28 @@ class Trainer:
 
     def evaluate(self):
         batch_size = self.configs['eval']['batch_size']
-        eval_loader = self.data_processor.get_eval_loader(batch_size)
+        eval_set = self.data_processor.get_eval_set()
         metric = evaluate.load('rouge')
 
         self.model.eval()
         loss = 0
-        for batch in eval_loader:
-            batch = {k: v.to(self.device) for k, v in batch.items()}
+        for sample in eval_set:
+            input_ids = sample['input_ids'].unsqueeze(0)
+            attention_mask = sample['attention_mask'].unsqueeze(0)
+            labels = sample['labels'].unsqueeze(0)
             with torch.no_grad():
-                loss += self.model(input_ids=batch['input_ids'],
-                                   attention_mask=batch['attention_mask'],
-                                   labels=batch['labels']).loss.item()
+                loss += self.model(input_ids=input_ids,
+                                   attention_mask=attention_mask,
+                                   labels=labels).loss.item()
                 outputs = self.model.generate(
-                    input_ids=batch['input_ids'],
-                    attention_mask=batch['attention_mask']
+                    input_ids=input_ids,
+                    attention_mask=attention_mask
                 )
 
             inferences = self.tokenizer.batch_decode(outputs,
                                                      skip_special_tokens=True)
-            metric.add_batch(predictions=inferences,
-                             references=[batch['answers']])
+            metric.add(predictions=inferences,
+                       references=[sample['answers']])
         eval_results = metric.compute()
         eval_results['loss'] = loss / batch_size
         return eval_results
