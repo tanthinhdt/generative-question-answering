@@ -38,7 +38,7 @@ class Trainer:
             'train_loss': [],
             'eval_loss': [],
             'rougeL': [],
-            'rougeLSum': []
+            'rougeLsum': []
         }
 
     def get_tokenizer_and_model(self):
@@ -88,6 +88,7 @@ class Trainer:
 
         progress_bar = tqdm(range(num_trainining_steps),
                             desc='Training', unit='step', leave=False)
+        progress_bar.write('\n')
         steps = 0
         if self.configs['train']['from_checkpoint']:
             steps = self.configs['resume']['step']
@@ -149,7 +150,7 @@ class Trainer:
 
         self.history['eval_loss'].append(eval_results['loss'])
         self.history['rougeL'].append(eval_results['rougeL'])
-        self.history['rougeLSum'].append(eval_results['rougeLSum'])
+        self.history['rougeLsum'].append(eval_results['rougeLsum'])
 
         return eval_results
 
