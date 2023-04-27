@@ -147,13 +147,13 @@ class Trainer:
     def save(self, step: int):
         checkpoint_dir = self.configs['train']['checkpoint_dir']
 
-        model_checkpoint_path = checkpoint_dir + f'model_{step}.pt'
+        model_checkpoint_path = checkpoint_dir + f'/model_{step}.pt'
         torch.save(self.model.state_dict(), model_checkpoint_path)
 
-        optimizer_checkpoint_path = checkpoint_dir + f'optimizer_{step}.pt'
+        optimizer_checkpoint_path = checkpoint_dir + f'/optimizer_{step}.pt'
         torch.save(self.optimizer.state_dict(), optimizer_checkpoint_path)
 
-        scheduler_checkpoint_path = checkpoint_dir + f'scheduler_{step}.pt'
+        scheduler_checkpoint_path = checkpoint_dir + f'/scheduler_{step}.pt'
         torch.save(self.scheduler.state_dict(), scheduler_checkpoint_path)
 
 
