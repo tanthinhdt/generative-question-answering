@@ -113,9 +113,15 @@ class Trainer:
         self.model.eval()
         loss = 0
         for sample in eval_set:
-            input_ids = sample['input_ids'].unsqueeze(0)
-            attention_mask = sample['attention_mask'].unsqueeze(0)
-            labels = sample['labels'].unsqueeze(0)
+            input_ids = (sample['input_ids']
+                         .unsqueeze(0)
+                         .to(self.device))
+            attention_mask = (sample['attention_mask']
+                              .unsqueeze(0)
+                              .to(self.device))
+            labels = (sample['labels']
+                      .unsqueeze(0)
+                      .to(self.device))
             with torch.no_grad():
                 loss += self.model(input_ids=input_ids,
                                    attention_mask=attention_mask,
