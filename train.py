@@ -87,6 +87,7 @@ class Trainer:
         self.model.train()
 
         progress_bar = tqdm(range(num_trainining_steps),
+                            total=num_trainining_steps,
                             desc='Training', unit='step', leave=False)
         steps = 0
         if self.configs['train']['from_checkpoint']:
@@ -103,7 +104,7 @@ class Trainer:
                 self.optimizer.zero_grad()
 
                 if steps != 0 and steps % num_logging_steps == 0:
-                    message = f'Training at {steps} >> Loss: {loss.item()}'
+                    message = f'Logging at {steps} >> Loss: {loss.item()}'
                     progress_bar.write(message)
 
                 if steps != 0 and steps % num_saving_steps == 0:
