@@ -8,7 +8,7 @@ from transformers import get_scheduler
 from src.data.data_processor import DataProcessor
 from models.t5.t5_small import T5Small
 from models.bart.bart_base import BartBase
-from tqdm import tqdm
+from tqdm.auto import tqdm
 
 
 def get_args() -> argparse.Namespace:
@@ -88,7 +88,6 @@ class Trainer:
 
         progress_bar = tqdm(range(num_trainining_steps),
                             desc='Training', unit='step', leave=False)
-        progress_bar.write('\n')
         steps = 0
         if self.configs['train']['from_checkpoint']:
             steps = self.configs['resume']['step']
