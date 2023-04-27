@@ -109,7 +109,7 @@ class Trainer:
     def evaluate(self):
         num_eval_samples = self.configs['data']['num_eval_samples']
         batch_size = self.configs['eval']['batch_size']
-        eval_loader = self.data_processor.get_eval_loader()
+        eval_loader = self.data_processor.get_eval_loader(batch_size)
         metric = evaluate.load('rouge')
 
         self.model.eval()
