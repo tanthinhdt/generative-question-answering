@@ -72,6 +72,7 @@ class Trainer:
         num_trainining_steps = self.configs['train']['num_training_steps']
         num_logging_steps = self.configs['train']['num_logging_steps']
         num_saving_steps = self.configs['train']['num_saving_steps']
+        num_eval_steps = self.configs['train']['num_eval_steps']
         batch_size = self.configs['train']['batch_size']
         train_loader = self.data_processor.get_train_loader(batch_size)
 
@@ -96,15 +97,23 @@ class Trainer:
                 if steps != 0 and steps % num_saving_steps == 0:
                     self.save(steps)
 
+                if steps != 0 and steps % num_eval_steps == 0:
+                    self.evaluate()
+                steps += 1
+
     def evaluate(self):
         batch_size = self.configs['eval']['batch_size']
         eval_loader = self.data_processor.get_eval_loader(batch_size)
         metric = evaluate.load('rouge')
 
         self.model.eval()
+        loss = 0
         for batch in eval_loader:
             batch = {k: v.to(self.device) for k, v in batch.items()}
             with torch.no_grad():
+                loss += self.model(input_ids=batch['input_ids'],
+                                   attention_mask=batch['attention_mask'],
+                                   labels=batch['labels']).loss.item()
                 outputs = self.model.generate(input_ids=batch['input_ids'])
 
             inferences = self.tokenizer.decode(outputs[0],
@@ -112,7 +121,9 @@ class Trainer:
             answers = batch['answers']
             metric.add_batch(predictions=inferences,
                              references=answers)
-        return metric.compute
+        eval_results = metric.compute()
+        eval_results['loss'] = loss / batch_size
+        return eval_results
 
     def load_checkpoint(self):
         model_checkpoint_path = self.configs['checpoints']['model']

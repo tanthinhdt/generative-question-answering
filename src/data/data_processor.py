@@ -40,8 +40,7 @@ class DataProcessor:
     def get_eval_set(self):
         eval_set = self.dataset['val'].map(
             self.__process_sample,
-            remove_columns=['question_id', 'question', 'ctxs',
-                            'attention_mask', 'labels']
+            remove_columns=['question_id', 'question', 'ctxs']
         )
         return eval_set
 
