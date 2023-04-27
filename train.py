@@ -108,36 +108,30 @@ class Trainer:
 
     def evaluate(self):
         num_eval_samples = self.configs['data']['num_eval_samples']
-        eval_set = self.data_processor.get_eval_set()
+        batch_size = self.configs['eval']['batch_size']
+        eval_loader = self.data_processor.get_eval_loader()
         metric = evaluate.load('rouge')
 
         self.model.eval()
         loss = 0
-        for sample in eval_set:
-            input_ids = (sample['input_ids']
-                         .unsqueeze(0)
-                         .to(self.device))
-            attention_mask = (sample['attention_mask']
-                              .unsqueeze(0)
-                              .to(self.device))
-            labels = (sample['labels']
-                      .unsqueeze(0)
-                      .to(self.device))
+        for batch in eval_loader:
+            batch = {k: v.to(self.device) if k != 'answers' else v
+                     for k, v in batch.items()}
             with torch.no_grad():
-                loss += self.model(input_ids=input_ids,
-                                   attention_mask=attention_mask,
-                                   labels=labels).loss.item()
+                loss += self.model(input_ids=batch['input_ids'],
+                                   attention_mask=batch['attention_mask'],
+                                   labels=batch['labels']).loss.item()
                 outputs = self.model.generate(
-                    input_ids=input_ids,
-                    attention_mask=attention_mask
+                    input_ids=batch['input_ids'],
+                    attention_mask=batch['attention_mask']
                 )
 
             inferences = self.tokenizer.batch_decode(outputs,
                                                      skip_special_tokens=True)
             metric.add_batch(predictions=inferences,
-                             references=[sample['answers']])
+                             references=[batch['answers']])
         eval_results = metric.compute()
-        eval_results['loss'] = loss / num_eval_samples
+        eval_results['loss'] = loss / math.ceil(num_eval_samples / batch_size)
         return eval_results
 
     def load_checkpoint(self):
