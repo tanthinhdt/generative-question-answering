@@ -129,7 +129,7 @@ class Trainer:
             inferences = self.tokenizer.batch_decode(outputs,
                                                      skip_special_tokens=True)
             metric.add_batch(predictions=inferences,
-                             references=[batch['answers']])
+                             references=batch['answers'])
         eval_results = metric.compute()
         eval_results['loss'] = loss / math.ceil(num_eval_samples / batch_size)
         return eval_results
