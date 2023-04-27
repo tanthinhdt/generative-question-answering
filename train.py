@@ -81,11 +81,7 @@ class Trainer:
         for _ in range(num_epochs):
             for batch in train_loader:
                 batch = {k: v.to(self.device) for k, v in batch.items()}
-                outputs = self.model(
-                    input_ids=batch['input_ids'],
-                    attention_mask=batch['attention_mask'],
-                    decoder_input_ids=batch['labels']
-                )
+                outputs = self.model(**batch)
                 loss = outputs.loss
                 loss.backward()
 
