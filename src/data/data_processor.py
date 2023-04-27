@@ -1,9 +1,9 @@
 import os
 import torch
+from torch.utils.data import DataLoader
+from transformers import DefaultDataCollator
 from src.data.eli5 import ELI5
 from src.utils import remove_redundant_spaces
-from transformers import DefaultDataCollator
-from torch.utils.data import DataLoader
 
 
 class DataProcessor:
@@ -73,15 +73,14 @@ class DataProcessor:
         attention_mask = encoder_inputs['attention_mask']
 
         decoder_inputs = self.encode(answer)
-        decoder_input_ids = decoder_inputs['input_ids']
+        labels = decoder_inputs['input_ids']
 
-        decoder_input_ids[decoder_input_ids ==
-                          self.tokenizer.pad_token_id] = -100
+        labels[labels == self.tokenizer.pad_token_id] = -100
 
         sample = {
             'input_ids': input_ids.squeeze(0),
             'attention_mask': attention_mask.squeeze(0),
-            'decoder_input_ids': decoder_input_ids.squeeze(0)
+            'labels': labels.squeeze(0)
         }
 
         return sample
