@@ -144,7 +144,7 @@ class Trainer:
                                                      skip_special_tokens=True)
             metric.add_batch(predictions=inferences,
                              references=batch['answers'])
-        eval_results = metric.compute(rouge_types=['rougeL', 'rougeLSum'])
+        eval_results = metric.compute(rouge_types=['rougeL', 'rougeLsum'])
         eval_results['loss'] = loss / math.ceil(num_eval_samples / batch_size)
 
         self.history['eval_loss'].append(eval_results['loss'])
