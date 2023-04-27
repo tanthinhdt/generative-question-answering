@@ -85,12 +85,12 @@ class Trainer:
         train_loader = self.data_processor.get_train_loader(batch_size)
 
         self.model.train()
-        start = 0
-        if self.configs['train']['from_checkpoint']:
-            start = self.configs['resume']['step']
-        progress_bar = tqdm(range(start, num_trainining_steps + start),
+
+        progress_bar = tqdm(range(num_trainining_steps),
                             desc='Training', unit='step', leave=False)
         steps = 0
+        if self.configs['train']['from_checkpoint']:
+            steps = self.configs['resume']['step']
         for _ in range(num_epochs):
             for batch in train_loader:
                 batch = {k: v.to(self.device) for k, v in batch.items()}
