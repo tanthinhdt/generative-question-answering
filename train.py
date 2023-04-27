@@ -3,11 +3,12 @@ import argparse
 import json
 import torch
 import math
+import os
 from transformers import get_scheduler
 from src.data.data_processor import DataProcessor
 from models.t5.t5_small import T5Small
 from models.bart.bart_base import BartBase
-from tqdm.auto import tqdm
+from tqdm import tqdm
 
 
 def get_args() -> argparse.Namespace:
@@ -32,6 +33,13 @@ class Trainer:
 
         if self.configs['train']['from_checkpoint']:
             self.load_checkpoint()
+
+        self.history = {
+            'train_loss': [],
+            'eval_loss': [],
+            'rougeL': [],
+            'rougeLSum': []
+        }
 
     def get_tokenizer_and_model(self):
         model_dict = {
@@ -77,7 +85,8 @@ class Trainer:
         train_loader = self.data_processor.get_train_loader(batch_size)
 
         self.model.train()
-        progress_bar = tqdm(range(num_trainining_steps))
+        progress_bar = tqdm(range(num_trainining_steps), desc='Training',
+                            unit='step', leave=False)
         steps = 0
         for _ in range(num_epochs):
             for batch in train_loader:
@@ -91,20 +100,22 @@ class Trainer:
                 self.optimizer.zero_grad()
 
                 if steps != 0 and steps % num_logging_steps == 0:
-                    progress_bar.write(f'Logging >> Loss: {loss.item()}')
+                    message = f'Training at {steps} >> Loss: {loss.item()}'
+                    progress_bar.write(message)
 
                 if steps != 0 and steps % num_saving_steps == 0:
                     self.save(steps)
 
                 if steps != 0 and steps % num_eval_steps == 0:
                     eval_results = self.evaluate()
-                    message = 'Evaluation >> '
+                    message = f'Evaluation at {steps} >> '
                     message += ', '.join(
                         [f'{m}: {v}' for m, v in eval_results.items()])
                     progress_bar.write(message)
 
                 progress_bar.update(1)
                 steps += 1
+        progress_bar.close()
 
     def evaluate(self):
         num_eval_samples = self.configs['data']['num_eval_samples']
@@ -130,8 +141,13 @@ class Trainer:
                                                      skip_special_tokens=True)
             metric.add_batch(predictions=inferences,
                              references=batch['answers'])
-        eval_results = metric.compute()
+        eval_results = metric.compute(rouge_types=['rougeL', 'rougeLSum'])
         eval_results['loss'] = loss / math.ceil(num_eval_samples / batch_size)
+
+        self.history['eval_loss'].append(eval_results['loss'])
+        self.history['rougeL'].append(eval_results['rougeL'])
+        self.history['rougeLSum'].append(eval_results['rougeLSum'])
+
         return eval_results
 
     def load_checkpoint(self):
@@ -145,16 +161,26 @@ class Trainer:
         self.scheduler.load_state_dict(torch.load(scheduler_checkpoint_path))
 
     def save(self, step: int):
-        checkpoint_dir = self.configs['train']['checkpoint_dir']
+        entry = self.configs['entry']
+        checkpoint_dir = self.configs['train']['checkpoint_dir'] + f'/{entry}'
+
+        if not os.path.exists(checkpoint_dir):
+            os.makedirs(checkpoint_dir)
 
         model_checkpoint_path = checkpoint_dir + f'/model_{step}.pt'
         torch.save(self.model.state_dict(), model_checkpoint_path)
 
-        optimizer_checkpoint_path = checkpoint_dir + f'/optimizer_{step}.pt'
+        optimizer_checkpoint_path = checkpoint_dir
+        optimizer_checkpoint_path += f'/optimizer_{step}.pt'
         torch.save(self.optimizer.state_dict(), optimizer_checkpoint_path)
 
-        scheduler_checkpoint_path = checkpoint_dir + f'/scheduler_{step}.pt'
+        scheduler_checkpoint_path = checkpoint_dir
+        scheduler_checkpoint_path += f'/scheduler_{step}.pt'
         torch.save(self.scheduler.state_dict(), scheduler_checkpoint_path)
+
+        log_path = checkpoint_dir + f'/{entry}.json'
+        with open(log_path, 'w') as f:
+            json.dump(self.history, f)
 
 
 if __name__ == '__main__':

@@ -54,10 +54,6 @@ class DataProcessor:
             attention_mask_list.append(sample['attention_mask'])
             labels_list.append(sample['labels'])
             answers_list.append(sample['answers'])
-        # input_ids_list = torch.stack(input_ids_list)
-        # attention_mask_list = torch.stack(attention_mask_list)
-        # labels_list = torch.stack(labels_list)
-        # return input_ids_list, attention_mask_list, labels_list, answers_list
         return {
             'input_ids': torch.stack(input_ids_list),
             'attention_mask': torch.stack(attention_mask_list),
