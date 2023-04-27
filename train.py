@@ -151,13 +151,20 @@ class Trainer:
         return eval_results
 
     def load_checkpoint(self):
-        model_checkpoint_path = self.configs['checpoints']['model']
+        entry = self.configs['resume']['entry']
+        step = self.configs['resume']['step']
+        checkpoint_dir = self.configs['train']['checkpoint_dir'] + f'/{entry}'
+
+        model_checkpoint_path = os.path.join(checkpoint_dir, entry,
+                                             f'model_{step}.pt')
         self.model.load_state_dict(torch.load(model_checkpoint_path))
 
-        optimizer_checkpoint_path = self.configs['checpoints']['optimizer']
+        optimizer_checkpoint_path = os.path.join(checkpoint_dir, entry,
+                                                 f'optimizer_{step}.pt')
         self.optimizer.load_state_dict(torch.load(optimizer_checkpoint_path))
 
-        scheduler_checkpoint_path = self.configs['checpoints']['scheduler']
+        scheduler_checkpoint_path = os.path.join(checkpoint_dir, entry,
+                                                 f'scheduler_{step}.pt')
         self.scheduler.load_state_dict(torch.load(scheduler_checkpoint_path))
 
     def save(self, step: int):
@@ -180,7 +187,7 @@ class Trainer:
 
         log_path = checkpoint_dir + f'/{entry}.json'
         with open(log_path, 'w') as f:
-            json.dump(self.history, f)
+            json.dump(self.history, f, indent=4)
 
 
 if __name__ == '__main__':
