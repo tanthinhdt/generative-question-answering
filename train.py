@@ -89,9 +89,10 @@ class Trainer:
         progress_bar = tqdm(range(num_trainining_steps),
                             total=num_trainining_steps,
                             desc='Training', unit='step', leave=False)
-        steps = 0
+        start = 0
         if self.configs['train']['from_checkpoint']:
-            steps = self.configs['resume']['step']
+            start = self.configs['resume']['step']
+        steps = start
         for _ in range(num_epochs):
             for batch in train_loader:
                 batch = {k: v.to(self.device) for k, v in batch.items()}
@@ -103,14 +104,15 @@ class Trainer:
                 self.scheduler.step()
                 self.optimizer.zero_grad()
 
-                if steps != 0 and steps % num_logging_steps == 0:
+                if steps != start and steps % num_logging_steps == 0:
                     message = f'Logging at {steps} >> Loss: {loss.item()}'
                     progress_bar.write(message)
 
-                if steps != 0 and steps % num_saving_steps == 0:
+                if steps != start and steps % num_saving_steps == 0:
                     self.save(steps)
 
-                if steps != 0 and steps % num_eval_steps == 0:
+                if steps != start and steps % num_eval_steps == 0:
+                    self.history['train_loss'].append(loss.item())
                     eval_results = self.evaluate()
                     message = f'Evaluation at {steps} >> '
                     message += ', '.join(
@@ -155,6 +157,8 @@ class Trainer:
         return eval_results
 
     def load_checkpoint(self):
+        '''Load the checkpoint defined in the config file.
+        '''
         entry = self.configs['resume']['entry']
         step = self.configs['resume']['step']
         checkpoint_dir = self.configs['train']['checkpoint_dir']
@@ -172,11 +176,17 @@ class Trainer:
         self.scheduler.load_state_dict(torch.load(scheduler_checkpoint_path))
 
     def save(self, step: int):
+        '''Save the model, optimizer and scheduler states. The 
+
+        Parameters:
+            step (int): The current step.
+        '''
         entry = self.configs['entry']
-        checkpoint_dir = self.configs['train']['checkpoint_dir'] + f'/{entry}'
+        checkpoint_dir = os.path.join(self.configs['train']['checkpoint_dir'],
+                                      entry)
         if not os.path.exists(checkpoint_dir):
             os.makedirs(checkpoint_dir)
-        log_dir = self.configs['train']['log_dir'] + f'/{entry}'
+        log_dir = os.path.join(self.configs['train']['log_dir'], entry)
         if not os.path.exists(log_dir):
             os.makedirs(log_dir)
 
