@@ -18,9 +18,9 @@
         "per_device_eval_batch_size": 2,
         "auto_find_batch_size": true,
         "learning_rate": 3e-4,
-        "num_train_epochs": 3,
-        "max_steps": 5000,
-        "weight_decay": 0.01,
+        "num_train_epochs": 5,
+        "max_steps": 20000,
+        "weight_decay": 0.005,
         "logging_dir": "logs/bart/bart_base",
         "logging_strategy": "steps",
         "logging_steps": 100,
@@ -32,8 +32,5 @@
         "run_name": "bart-base",
         "report_to": "wandb",
         "gradient_checkpointing": true
-    },
-    "knowledge": {
-        "configs_path": "configs/knowledge.json"
     }
 }

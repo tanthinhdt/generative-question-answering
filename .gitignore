@@ -135,3 +135,12 @@ wandb/
 
 # test files
 test*
+
+# checkpoints
+checkpoints
+
+# logs
+logs
+
+# connection configs
+connection.json

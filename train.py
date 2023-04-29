@@ -174,9 +174,11 @@ class Trainer:
     def save(self, step: int):
         entry = self.configs['entry']
         checkpoint_dir = self.configs['train']['checkpoint_dir'] + f'/{entry}'
-
         if not os.path.exists(checkpoint_dir):
             os.makedirs(checkpoint_dir)
+        log_dir = self.configs['train']['log_dir'] + f'/{entry}'
+        if not os.path.exists(log_dir):
+            os.makedirs(log_dir)
 
         model_checkpoint_path = checkpoint_dir + f'/model_{step}.pt'
         torch.save(self.model.state_dict(), model_checkpoint_path)

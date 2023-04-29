@@ -1,0 +1,9 @@
+{
+    "connection": {
+        "configs_path": "configs/connection.json"
+    },
+    "pretrained": "cross-encoder/ms-marco-TinyBERT-L-2-v2",
+    "metric": "cosine_similarity",
+    "src": "wiki40b",
+    "batch_size": 4
+}
