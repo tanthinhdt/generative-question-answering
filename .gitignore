@@ -138,6 +138,7 @@ test*
 
 # checkpoints
 checkpoints
+outputs
 
 # logs
 logs
