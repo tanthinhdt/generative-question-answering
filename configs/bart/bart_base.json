@@ -2,9 +2,6 @@
     "entry": "20230429E001",
     "name": "bart-base",
     "pretrained": "facebook/bart-base",
-    "model": {
-        "use_cache": true
-    },
     "tokenizer": {
         "truncation": true,
         "padding": "max_length",

@@ -49,7 +49,9 @@ class Trainer:
 
         name = self.configs['name']
         pretrained = self.configs['pretrained']
-        return model_dict[name](pretrained, **self.configs['model'])()
+        model_configs = self.configs.get('model', None)
+        model_configs = model_configs if model_configs else dict()
+        return model_dict[name](pretrained, **model_configs)()
 
     def get_data_processor(self):
         dataset_dir = self.configs['data']['dir']
