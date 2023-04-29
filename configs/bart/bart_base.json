@@ -1,36 +1,38 @@
 {
+    "entry": "20230429E001",
+    "name": "bart-base",
+    "pretrained": "facebook/bart-base",
     "model": {
-        "name": "bart-base",
-        "pretrained": "a-ware/bart-squadv2"
+        "use_cache": true
     },
     "tokenizer": {
         "truncation": true,
         "padding": "max_length",
         "return_tensors": "pt"
     },
-    "dataset": {
-        "dir": "data/ELI5"
+    "data": {
+        "dir": "data/ELI5",
+        "num_training_samples": 272334,
+        "num_eval_samples": 1507
+    },
+    "optimizer": {
+        "lr": 3e-4
     },
     "train": {
-        "do_train": true,
-        "include_inputs_for_metrics": true,
-        "per_device_train_batch_size": 2,
-        "per_device_eval_batch_size": 2,
-        "auto_find_batch_size": true,
-        "learning_rate": 3e-4,
-        "num_train_epochs": 5,
-        "max_steps": 20000,
-        "weight_decay": 0.005,
-        "logging_dir": "logs/bart/bart_base",
-        "logging_strategy": "steps",
-        "logging_steps": 100,
-        "output_dir": "checkpoints/bart/bart_base",
-        "overwrite_output_dir": true,
-        "save_strategy": "steps",
-        "save_steps": 500,
-        "save_total_limit": 5,
-        "run_name": "bart-base",
-        "report_to": "wandb",
-        "gradient_checkpointing": true
+        "from_checkpoint": false,
+        "batch_size": 2,
+        "num_epochs": 3,
+        "num_logging_steps": 200,
+        "num_saving_steps": 1000,
+        "num_eval_steps": 1000,
+        "checkpoint_dir": "outputs/bart/bart_base",
+        "log_dir": "outputs/bart/bart_base"
+    },
+    "eval": {
+        "batch_size": 2
+    },
+    "resume": {
+        "entry": "20230428E003",
+        "step": 18000
     }
 }

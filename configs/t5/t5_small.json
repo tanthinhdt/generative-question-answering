@@ -1,5 +1,5 @@
 {
-    "entry": "20230428E001",
+    "entry": "20230429E001",
     "name": "t5-small",
     "pretrained": "t5-small",
     "model": {
@@ -19,20 +19,20 @@
         "lr": 3e-4
     },
     "train": {
-        "from_checkpoint": false,
-        "batch_size": 16,
+        "from_checkpoint": true,
+        "batch_size": 2,
         "num_epochs": 3,
-        "num_logging_steps": 100,
+        "num_logging_steps": 200,
         "num_saving_steps": 1000,
-        "num_eval_steps": 500,
-        "checkpoint_dir": "checkpoints/t5/t5_small",
-        "log_dir": "logs/t5/t5_small"
+        "num_eval_steps": 1000,
+        "checkpoint_dir": "outputs/t5/t5_small",
+        "log_dir": "outputs/t5/t5_small"
     },
     "eval": {
-        "batch_size": 1
+        "batch_size": 2
     },
     "resume": {
-        "entry": "20230428E001",
-        "step": 100
+        "entry": "20230428E003",
+        "step": 18000
     }
 }
