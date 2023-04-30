@@ -6,11 +6,12 @@ class T5Small:
                  **configs):
         self.tokenizer = T5Tokenizer.from_pretrained(pretrained)
 
-        decoder_start_token_id = self.tokenizer.convert_tokens_to_ids(['<pad>'])[0]
+        decoder_start_token_id = (self.tokenizer
+                                  .convert_tokens_to_ids(['<pad>'])[0])
         if not configs:
             configs = dict()
         configs['decoder_start_token_id'] = decoder_start_token_id
-        self.configs = T5Config(**configs)
+        self.configs = T5Config.from_pretrained(pretrained, **configs)
         self.model = T5ForConditionalGeneration(self.configs)
         self.model.from_pretrained(pretrained)
 

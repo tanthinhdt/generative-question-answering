@@ -1,5 +1,5 @@
 {
-    "entry": "20230429E001",
+    "entry": "20230430E001",
     "name": "t5-small",
     "pretrained": "t5-small",
     "model": {
@@ -25,6 +25,7 @@
         "num_logging_steps": 200,
         "num_saving_steps": 1000,
         "num_eval_steps": 1000,
+        "num_checkpoints": 3,
         "checkpoint_dir": "outputs/t5/t5_small",
         "log_dir": "outputs/t5/t5_small"
     },
@@ -32,7 +33,7 @@
         "batch_size": 2
     },
     "resume": {
-        "entry": "20230428E003",
-        "step": 18000
+        "entry": "20230429E001",
+        "step": 100000
     }
 }

@@ -1,8 +1,9 @@
 {
-    "entry": "20230429E001",
+    "entry": "20230501E001",
     "name": "bart-base",
     "pretrained": "facebook/bart-base",
     "tokenizer": {
+        "max_length": 256,
         "truncation": true,
         "padding": "max_length",
         "return_tensors": "pt"
@@ -17,11 +18,12 @@
     },
     "train": {
         "from_checkpoint": false,
-        "batch_size": 2,
+        "batch_size": 1,
         "num_epochs": 3,
         "num_logging_steps": 200,
         "num_saving_steps": 1000,
         "num_eval_steps": 1000,
+        "num_checkpoints": 3,
         "checkpoint_dir": "outputs/bart/bart_base",
         "log_dir": "outputs/bart/bart_base"
     },
@@ -29,7 +31,7 @@
         "batch_size": 2
     },
     "resume": {
-        "entry": "20230428E003",
+        "entry": "20230501E001",
         "step": 18000
     }
 }
