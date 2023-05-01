@@ -221,6 +221,7 @@ class Trainer:
         scheduler_checkpoint_path = os.path.join(checkpoint_dir,
                                                  scheduler_checkpoint)
         torch.save(self.scheduler.state_dict(), scheduler_checkpoint_path)
+        self.saved_checkpoints['scheduler'].append(scheduler_checkpoint)
         if len(self.saved_checkpoints['scheduler']) > n_checkpoints:
             os.remove(os.path.join(checkpoint_dir,
                                    self.saved_checkpoints['scheduler'].pop(0)))
