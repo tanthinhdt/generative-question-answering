@@ -41,6 +41,12 @@ class Trainer:
             'rougeLsum': []
         }
 
+        self.saved_checkpoints = {
+            'model': [],
+            'optimizer': [],
+            'scheduler': []
+        }
+
     def get_tokenizer_and_model(self):
         model_dict = {
             't5-small': T5Small,
@@ -142,7 +148,8 @@ class Trainer:
                                    labels=batch['labels']).loss.item()
                 outputs = self.model.generate(
                     input_ids=batch['input_ids'],
-                    attention_mask=batch['attention_mask']
+                    attention_mask=batch['attention_mask'],
+                    num_beams=2, max_length=32
                 )
 
             inferences = self.tokenizer.batch_decode(outputs,
@@ -191,17 +198,32 @@ class Trainer:
         log_dir = os.path.join(self.configs['train']['log_dir'], entry)
         if not os.path.exists(log_dir):
             os.makedirs(log_dir)
+        n_checkpoints = self.configs['train']['num_checkpoints']
 
-        model_checkpoint_path = checkpoint_dir + f'/model_{step}.pt'
+        model_checkpoint = f'model_{step}.pt'
+        model_checkpoint_path = os.path.join(checkpoint_dir, model_checkpoint)
         torch.save(self.model.state_dict(), model_checkpoint_path)
+        self.saved_checkpoints['model'].append(model_checkpoint)
+        if len(self.saved_checkpoints['model']) > n_checkpoints:
+            os.remove(os.path.join(checkpoint_dir,
+                                   self.saved_checkpoints['model'].pop(0)))
 
-        optimizer_checkpoint_path = checkpoint_dir
-        optimizer_checkpoint_path += f'/optimizer_{step}.pt'
+        optimizer_checkpoint = f'optimizer_{step}.pt'
+        optimizer_checkpoint_path = os.path.join(checkpoint_dir,
+                                                 optimizer_checkpoint)
         torch.save(self.optimizer.state_dict(), optimizer_checkpoint_path)
+        self.saved_checkpoints['optimizer'].append(optimizer_checkpoint)
+        if len(self.saved_checkpoints['optimizer']) > n_checkpoints:
+            os.remove(os.path.join(checkpoint_dir,
+                                   self.saved_checkpoints['optimizer'].pop(0)))
 
-        scheduler_checkpoint_path = checkpoint_dir
-        scheduler_checkpoint_path += f'/scheduler_{step}.pt'
+        scheduler_checkpoint = f'scheduler_{step}.pt'
+        scheduler_checkpoint_path = os.path.join(checkpoint_dir,
+                                                 scheduler_checkpoint)
         torch.save(self.scheduler.state_dict(), scheduler_checkpoint_path)
+        if len(self.saved_checkpoints['scheduler']) > n_checkpoints:
+            os.remove(os.path.join(checkpoint_dir,
+                                   self.saved_checkpoints['scheduler'].pop(0)))
 
         log_path = checkpoint_dir + f'/{entry}.json'
         with open(log_path, 'w') as f:
