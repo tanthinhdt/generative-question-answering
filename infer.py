@@ -1,46 +1,94 @@
-from transformers import BartConfig, T5Config
-from transformers import AutoModel, AutoTokenizer
-from src.data.data_processor import DataProcessor
+import os
+import json
+import torch
 from knowledge_hub import KnowledgeHub
+from models.bart.bart_base import BartBase
+from models.t5.t5_small import T5Small
+from src.utils import remove_redundant_spaces
+
+
+def get_args():
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--configs-path', '-c', type=str,
+                        default='configs/inference.json',
+                        help='Path to the config file')
+    return parser.parse_args()
 
 
 class Inference():
     def __init__(self, configs) -> None:
         self.configs = configs
-        self.tokenizer = self.get_tokenizer()
-        self.model = self.get_model()
-        tokenizer_info = {
-            'tokenizer': self.tokenizer,
-            'configs': self.configs['tokenizers']
-        }
-        self.data_processor = DataProcessor(tokenizer_info=tokenizer_info)
+        self.tokenizer, self.model = self.get_tokenizer_and_model()
+        self.load_checkpoint()
+        with open(self.configs['knowledge_hub'], 'r') as f:
+            knowledge_hub_configs = json.load(f)
+        self.knowledge_hub = KnowledgeHub(knowledge_hub_configs)
 
-    def get_tokenizer(self):
-        pretrained = self.configs['pretrained']
-        return AutoTokenizer.from_pretrained(pretrained)
-
-    def get_model(self):
-        model_family_dict = {
-            'bart': BartConfig,
-            't5': T5Config
+    def get_tokenizer_and_model(self):
+        model_dict = {
+            't5-small': T5Small,
+            'bart-base': BartBase
         }
+
+        name = self.configs['name']
         pretrained = self.configs['pretrained']
-        decoder_start_token_id = (self.tokenizer
-                                  .convert_tokens_to_ids(['<pad>'])[0])
-        model_configs = model_family_dict[self.configs['type']](
-            decoder_start_token_id=decoder_start_token_id,
-            **self.configs['model']
+        model_configs = self.configs.get('model', None)
+        model_configs = model_configs if model_configs else dict()
+        return model_dict[name](pretrained, **model_configs)()
+
+    def load_checkpoint(self):
+        '''Load the checkpoint defined in the config file.
+        '''
+        entry = self.configs['resume']['entry']
+        step = self.configs['resume']['step']
+        checkpoint_dir = self.configs['resume']['checkpoint_dir']
+
+        model_checkpoint_path = os.path.join(checkpoint_dir, entry,
+                                             f'model_{step}.pt')
+        self.model.load_state_dict(torch.load(model_checkpoint_path))
+
+    def process_question(self, question: str, support_documents: list = None):
+        question = 'Answer this question: ' + remove_redundant_spaces(question)
+        if support_documents:
+            question += ', with the context: '
+            question += ', '.join([remove_redundant_spaces(d)
+                                   for d in support_documents])
+        return self.tokenizer(question, **self.configs['tokenizer'])
+
+    def infer(self, question: str):
+        top_k = self.configs['num_support_documents']
+        support_documents = None
+        if top_k > 0:
+            support_documents = self.knowledge_hub.query(question, top_k)
+        encoder_inputs = self.process_question(question, support_documents)
+        output = self.model.generate(
+            input_ids=encoder_inputs['input_ids'],
+            attention_mask=encoder_inputs['attention_mask'],
+            max_length=512,
+            num_beams=2
         )
-        model = AutoModel.from_config(model_configs)
-        return model.from_pretrained(pretrained)
-
-    def infer(self, question):
-        encoder_inputs = self.data_processor.encode(question, 'encoder')
-        input_ids = encoder_inputs['input_ids']
-        attetion_mask = encoder_inputs['attention_mask']
-        output = self.model.generate(input_ids=input_ids,
-                                     attetion_mask=attetion_mask,
-                                     max_length=512,
-                                     num_beams=2)
         inference = self.tokenizer.decode(output[0], skip_special_tokens=True)
-        return inference
+        return inference, support_documents
+
+
+if __name__ == '__main__':
+    args = get_args()
+    configs_path = args.configs_path
+
+    with open(configs_path, 'r') as f:
+        configs = json.load(f)
+    inference = Inference(configs)
+
+    # for debugging
+    # question = 'Why are different tiers (regular < mid < premium) of gas' prices almost always 10 cents different?'
+
+    print('\nEnter q to quit')
+    question = input('>>>>> Enter your question: ')
+    while question != 'q':
+        answer, support_documents = inference.infer(question)
+        print('\n# Supporting documents:')
+        print(*[f'{i + 1}. {d}' for i, d in enumerate(support_documents)],
+              sep='\n')
+        print('\n# Answer:\n' + answer)
+        question = input('\n>>>>> Enter your question: ')
