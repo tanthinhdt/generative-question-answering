@@ -72,14 +72,16 @@ class Trainer:
         num_epochs = self.configs['train']['num_epochs']
         num_training_samples = self.configs['data']['num_training_samples']
         training_batch_size = self.configs['train']['batch_size']
+        warmup_ratio = self.configs['scheduler']['warmup_ratio']
         train_loader_length = math.ceil(
             num_training_samples / training_batch_size
         )
         num_training_steps = num_epochs * train_loader_length
+        num_warmpup_steps = int(num_training_steps * warmup_ratio)
         self.configs['train']['num_training_steps'] = num_training_steps
         scheduler = get_scheduler('linear',
                                   optimizer=self.optimizer,
-                                  num_warmup_steps=0,
+                                  num_warmup_steps=num_warmpup_steps,
                                   num_training_steps=num_training_steps)
         return scheduler
 
