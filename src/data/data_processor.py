@@ -69,26 +69,20 @@ class DataProcessor:
         return eval_loader
 
     def __process_sample(self, sample: dict):
-        question = remove_redundant_spaces(sample['question'])
-        ctxs = ', '.join([remove_redundant_spaces(c) for c in sample['ctxs']])
+        question = 'Answer this question: '
+        question += remove_redundant_spaces(sample['question'])
+        question += ', with the context: '
+        question += ', '.join([remove_redundant_spaces(c)
+                               for c in sample['ctxs']])
+
         answer = ', '.join([remove_redundant_spaces(a)
                            for a in sample['answers']])
 
-        question_plus = f'Answer this question: {question}'
-        question_plus += f', with the context: {ctxs}'
-        answer_plus = f'{answer}'
-
-        return self.encode_sample(question_plus, answer_plus)
-
-    def encode(self, text: str):
-        return self.tokenizer(text, **self.tokenizer_configs)
-
-    def encode_sample(self, question: str, answer: str):
-        encoder_inputs = self.encode(question)
+        encoder_inputs = self.tokenizer(question, **self.tokenizer_configs)
         input_ids = encoder_inputs['input_ids']
         attention_mask = encoder_inputs['attention_mask']
 
-        decoder_inputs = self.encode(answer)
+        decoder_inputs = self.tokenizer(answer, **self.tokenizer_configs)
         labels = decoder_inputs['input_ids']
 
         labels[labels == self.tokenizer.pad_token_id] = -100
