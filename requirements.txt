@@ -7,4 +7,5 @@ rouge_score
 evaluate
 psycopg2
 tqdm
-wandb
+jax
+flax
