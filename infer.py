@@ -71,7 +71,7 @@ class Inference():
         of the model.
 
         Parameters:
-            question: str 
+            question: str
                 The question to be answered.
             support_document: list
                 The support documents for the question.
@@ -88,7 +88,7 @@ class Inference():
         Infer the answer to the question.
 
         Parameters:
-            question: str 
+            question: str
                 The question to be answered.
         """
         top_k = self.configs['num_support_documents']
