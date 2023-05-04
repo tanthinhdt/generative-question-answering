@@ -1,0 +1,7 @@
+{
+    "host": "localhost",
+    "dbname": "generative_question_answering",
+    "user": "postgres",
+    "password": "12345",
+    "port": 5433
+}

@@ -1,0 +1,16 @@
+{
+    "name": "t5-small",
+    "pretrained": "t5-small",
+    "tokenizer": {
+        "truncation": true,
+        "padding": "max_length",
+        "return_tensors": "pt"
+    },
+    "resume": {
+        "checkpoint_dir": "outputs/t5/t5_small",
+        "entry": "20230430E003",
+        "step": 137000
+    },
+    "num_support_documents": 3,
+    "knowledge_hub": "configs/knowledge_hub.json"
+}

@@ -1,10 +1,7 @@
 {
-    "entry": "20230430E001",
+    "entry": "20230503E002",
     "name": "t5-small",
     "pretrained": "t5-small",
-    "model": {
-        "use_cache": true
-    },
     "tokenizer": {
         "truncation": true,
         "padding": "max_length",
@@ -12,11 +9,15 @@
     },
     "data": {
         "dir": "data/ELI5",
-        "num_training_samples": 272334,
+        "num_training_samples": 272634,
         "num_eval_samples": 1507
     },
     "optimizer": {
-        "lr": 3e-4
+        "lr": 1e-4,
+        "weight_decay": 0
+    },
+    "scheduler": {
+        "warmup_ratio": 0
     },
     "train": {
         "from_checkpoint": true,
@@ -25,7 +26,7 @@
         "num_logging_steps": 200,
         "num_saving_steps": 1000,
         "num_eval_steps": 1000,
-        "num_checkpoints": 3,
+        "num_checkpoints": 2,
         "checkpoint_dir": "outputs/t5/t5_small",
         "log_dir": "outputs/t5/t5_small"
     },
@@ -33,7 +34,7 @@
         "batch_size": 2
     },
     "resume": {
-        "entry": "20230429E001",
-        "step": 100000
+        "entry": "20230503E001",
+        "step": 32000
     }
 }
