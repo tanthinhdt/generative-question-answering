@@ -1,11 +1,12 @@
-transformers
-accelerate
-datasets
-jaxlib
-sentencepiece
-rouge_score
-evaluate
-psycopg2
-tqdm
-jax
-flax
+python==3.9.16
+transformers==4.28.1
+# accelerate
+datasets==2.11.0
+jaxlib==0.4.7
+sentencepiece==0.1.98
+rouge_score==0.1.2
+evaluate==0.4.0
+psycopg2==2.9.3
+tqdm==4.65.0
+jax==0.4.8
+flax==0.6.9
