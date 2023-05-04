@@ -135,6 +135,7 @@ wandb/
 
 # test files
 test*
+!fusion_in_decoder/test.py
 
 # checkpoints
 checkpoints
@@ -142,6 +143,3 @@ outputs
 
 # logs
 logs
-
-# connection configs
-connection.json
