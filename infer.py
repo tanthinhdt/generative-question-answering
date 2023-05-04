@@ -8,6 +8,12 @@ from src.utils import remove_redundant_spaces
 
 
 def get_args():
+    """
+    Get the arguments from the command line.
+
+    Returns:
+        argparse.Namespace: Arguments.
+    """
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument('--configs-path', '-c', type=str,
@@ -18,6 +24,13 @@ def get_args():
 
 class Inference():
     def __init__(self, configs) -> None:
+        """
+        Initialize the inference.
+
+        Parameters:
+            configs: dict
+                The configs of the inference.
+        """
         self.configs = configs
         self.tokenizer, self.model = self.get_tokenizer_and_model()
         self.load_checkpoint()
@@ -26,6 +39,9 @@ class Inference():
         self.knowledge_hub = KnowledgeHub(knowledge_hub_configs)
 
     def get_tokenizer_and_model(self):
+        """
+        Get the tokenizer and model defined in the config file.
+        """
         model_dict = {
             't5-small': T5Small,
             'bart-base': BartBase
@@ -38,8 +54,9 @@ class Inference():
         return model_dict[name](pretrained, **model_configs)()
 
     def load_checkpoint(self):
-        '''Load the checkpoint defined in the config file.
-        '''
+        """
+        Load the checkpoint defined in the config file.
+        """
         entry = self.configs['resume']['entry']
         step = self.configs['resume']['step']
         checkpoint_dir = self.configs['resume']['checkpoint_dir']
@@ -49,6 +66,16 @@ class Inference():
         self.model.load_state_dict(torch.load(model_checkpoint_path))
 
     def process_question(self, question: str, support_documents: list = None):
+        """
+        Process the question and support documents into the input format
+        of the model.
+
+        Parameters:
+            question: str 
+                The question to be answered.
+            support_document: list
+                The support documents for the question.
+        """
         question = 'Answer this question: ' + remove_redundant_spaces(question)
         if support_documents:
             question += ', with the context: '
@@ -57,6 +84,13 @@ class Inference():
         return self.tokenizer(question, **self.configs['tokenizer'])
 
     def infer(self, question: str):
+        """
+        Infer the answer to the question.
+
+        Parameters:
+            question: str 
+                The question to be answered.
+        """
         top_k = self.configs['num_support_documents']
         support_documents = None
         if top_k > 0:

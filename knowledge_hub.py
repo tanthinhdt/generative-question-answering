@@ -11,17 +11,30 @@ from tqdm import tqdm
 
 
 def get_args() -> argparse.Namespace:
+    """
+    Get arguments from command line for inserting knowledge.
+
+    Returns:
+        argparse.Namespace: Arguments.
+    """
     parser = argparse.ArgumentParser()
     parser.add_argument('--configs-path', '-c', type=str, required=True,
                         help='Path to the config file')
     parser.add_argument('--n-samples', '-n', type=int,
                         default=5,
-                        help='Number of samples to be inserted if mode is insert knowledge')
+                        help='Number of samples to be inserted')
     return parser.parse_args()
 
 
 class KnowledgeHub:
     def __init__(self, configs: dict) -> None:
+        """
+        Initialize the knowledge hub.
+
+        Parameters:
+            configs: dict
+                The configs of the knowledge hub.
+        """
         self.configs = configs
         self.connection_configs = configs['connection']
         with open(self.connection_configs['configs_path'], 'r') as f:
@@ -30,6 +43,18 @@ class KnowledgeHub:
         self.model = AutoModel.from_pretrained(configs['pretrained'])
 
     def query(self, question: str, top_k: int = 3):
+        """
+        Find the supporting documents that are best suited for the query.
+
+        Parameters:
+            question: str
+                The question to be queried.
+            top_k: int
+                The number of supporting documents to be returned.
+
+        Returns:
+            list: A list of k supporting documents.
+        """
         src = self.configs['src']
         question_embedding = str(self.encode(question))
         metric_dict = {
@@ -53,6 +78,13 @@ class KnowledgeHub:
         return [text[0] for text in texts]
 
     def insert(self, n_samples: int):
+        """
+        Insert knowledge into the database.
+
+        Parameters:
+            n_samples: int
+                The number of samples to be inserted.
+        """
         datasets_dict = {
             'wiki40b': WikiSnippets('wiki40b_en_100_0'),
             'wikipedia': WikiSnippets('wikipedia_en_100_0')
@@ -91,14 +123,32 @@ class KnowledgeHub:
             print(f'Inserted {count} samples')
             cur.close()
 
-    def insert_batch(self, cur, src: str,
+    def insert_batch(self, cur, table: str,
                      ids: str, texts: str, embeddings: list):
+        """
+        Insert a batch of samples into the database.
+
+        Parameters:
+            cur: psycopg2.extensions.cursor
+                The cursor of the database.
+            table: str
+                The table name in the database.
+            ids: list
+                A list of ids.
+            texts: list
+                A list of texts.
+            embeddings: list
+                A list of embeddings.
+
+        Returns:
+            bool: True if the batch is inserted successfully, False otherwise.
+        """
         state = False
         for id, text, embedding in zip(ids, texts, embeddings):
             embedding = str(embedding)
             try:
                 cur.execute(
-                    f'INSERT INTO {src}' + ' VALUES (%s, %s, %s)',
+                    f'INSERT INTO {table}' + ' VALUES (%s, %s, %s)',
                     (id, text, embedding)
                 )
                 state = True
@@ -106,11 +156,30 @@ class KnowledgeHub:
                 cur.execute('ROLLBACK')
         return state
 
-    def insert_sample(self, cur, src: str, id: str, text: str, embedding: str):
+    def insert_sample(self, cur, table: str,
+                      id: str, text: str, embedding: str):
+        """
+        Insert a sample into the database.
+
+        Parameters:
+            cur: psycopg2.extensions.cursor
+                The cursor of the database.
+            table: str
+                The table name in the database.
+            id: str
+                The id of the sample.
+            text: str
+                The text of the sample.
+            embedding: str
+                The embedding of the text.
+
+        Returns:
+            bool: True if the sample is inserted successfully, False otherwise.
+        """
         state = False
         try:
             cur.execute(
-                f'INSERT INTO {src}' + ' VALUES (%s, %s, %s)',
+                f'INSERT INTO {table}' + ' VALUES (%s, %s, %s)',
                 (id, text, embedding)
             )
             state = True
@@ -119,6 +188,16 @@ class KnowledgeHub:
         return state
 
     def encode(self, text: str):
+        """
+        Encode the text into an embedding.
+
+        Parameters:
+            text: str
+                The text to be encoded.
+
+        Returns:
+            list: The embedding of the text.
+        """
         encoded_input = self.tokenizer(text, padding=True, truncation=True,
                                        return_tensors='pt')
         with torch.no_grad():
@@ -129,6 +208,18 @@ class KnowledgeHub:
         return embeddings.squeeze(0).tolist()
 
     def mean_pooling(self, model_output, attention_mask):
+        """
+        Perfrom mean pooling on the embedding.
+
+        Parameters:
+            model_output: dict
+                The output of the model.
+            attention_mask: torch.Tensor
+                The attention mask of the model.
+
+        Returns:
+            torch.Tensor: The embedding.
+        """
         token_embeddings = model_output.last_hidden_state
         input_mask_expanded = (attention_mask
                                .unsqueeze(-1)
@@ -139,6 +230,16 @@ class KnowledgeHub:
         return result
 
     def collate_fn(self, batch):
+        """
+        Create a batch of samples.
+
+        Parameters:
+            batch: list
+                A list of samples.
+
+        Returns:
+            dict: A batch of samples.
+        """
         id_list = []
         passage_text_list = []
         for sample in batch:

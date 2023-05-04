@@ -12,6 +12,12 @@ from tqdm.auto import tqdm
 
 
 def get_args() -> argparse.Namespace:
+    """
+    Get the arguments from the command line.
+
+    Returns:
+        argparse.Namespace: The arguments.
+    """
     parser = argparse.ArgumentParser()
     parser.add_argument('--configs-path', '-c', type=str, required=True,
                         help='Path to the config file')
@@ -20,6 +26,13 @@ def get_args() -> argparse.Namespace:
 
 class Trainer:
     def __init__(self, configs: dict) -> None:
+        """
+        Initialize the trainer.
+
+        Parameters:
+            configs: dict
+                The configurations for the trainer.
+        """
         self.configs = configs
         self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
         self.device = torch.device(self.device)
@@ -48,6 +61,13 @@ class Trainer:
         }
 
     def get_tokenizer_and_model(self):
+        """
+        Return the tokenizer and model defined in the config file.
+
+        Returns:
+            transformers.PreTrainedTokenizer: The tokenizer,
+            transformers.PreTrainedModel: The model.
+        """
         model_dict = {
             't5-small': T5Small,
             'bart-base': BartBase
@@ -60,6 +80,12 @@ class Trainer:
         return model_dict[name](pretrained, **model_configs)()
 
     def get_data_processor(self):
+        """
+        Create and return a data processor for the dataset.
+
+        Returns:
+            DataProcessor: A data processor for the dataset.
+        """
         dataset_dir = self.configs['data']['dir']
         tokenizer_info = {
             'tokenizer': self.tokenizer,
@@ -69,6 +95,12 @@ class Trainer:
                              dataset_dir=dataset_dir)
 
     def get_scheduler(self):
+        """
+        Create and return a scheduler for the optimizer.
+
+        Returns:
+            torch.optim.lr_scheduler: A scheduler for the optimizer.
+        """
         num_epochs = self.configs['train']['num_epochs']
         num_training_samples = self.configs['data']['num_training_samples']
         training_batch_size = self.configs['train']['batch_size']
@@ -86,6 +118,9 @@ class Trainer:
         return scheduler
 
     def train(self):
+        """
+        Train the model.
+        """
         num_epochs = self.configs['train']['num_epochs']
         num_trainining_steps = self.configs['train']['num_training_steps']
         num_logging_steps = self.configs['train']['num_logging_steps']
@@ -134,6 +169,13 @@ class Trainer:
         progress_bar.close()
 
     def evaluate(self):
+        """
+        Evaluate the model on the validation set.
+        Metrics include: ROUGE-L, ROUGE-Lsum, Loss
+
+        Returns:
+            dict: A dictionary of evaluation results.
+        """
         num_eval_samples = self.configs['data']['num_eval_samples']
         batch_size = self.configs['eval']['batch_size']
         eval_loader = self.data_processor.get_eval_loader(batch_size)
@@ -168,8 +210,9 @@ class Trainer:
         return eval_results
 
     def load_checkpoint(self):
-        '''Load the checkpoint defined in the config file.
-        '''
+        """
+        Load the checkpoint defined in the config file.
+        """
         entry = self.configs['resume']['entry']
         step = self.configs['resume']['step']
         checkpoint_dir = self.configs['train']['checkpoint_dir']
@@ -187,11 +230,13 @@ class Trainer:
         self.scheduler.load_state_dict(torch.load(scheduler_checkpoint_path))
 
     def save(self, step: int):
-        '''Save the model, optimizer and scheduler states. The 
+        """
+        Save the model, optimizer, scheduler states and training history.
 
         Parameters:
-            step (int): The current step.
-        '''
+            step: int
+                The current step.
+        """
         entry = self.configs['entry']
         checkpoint_dir = os.path.join(self.configs['train']['checkpoint_dir'],
                                       entry)
