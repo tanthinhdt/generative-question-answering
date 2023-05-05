@@ -8,8 +8,8 @@
     },
     "resume": {
         "checkpoint_dir": "outputs/t5/t5_small",
-        "entry": "20230503E002",
-        "step": 160000
+        "entry": "20230504E002",
+        "step": 212000
     },
     "num_support_documents": 3,
     "knowledge_hub": "configs/knowledge_hub.json"
