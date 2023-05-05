@@ -1,5 +1,5 @@
 {
-    "entry": "20230503E002",
+    "entry": "20230505E001",
     "name": "t5-small",
     "pretrained": "t5-small",
     "tokenizer": {
@@ -13,7 +13,7 @@
         "num_eval_samples": 1507
     },
     "optimizer": {
-        "lr": 1e-4,
+        "lr": 2e-4,
         "weight_decay": 0
     },
     "scheduler": {
@@ -34,7 +34,7 @@
         "batch_size": 2
     },
     "resume": {
-        "entry": "20230503E001",
-        "step": 32000
+        "entry": "20230504E002",
+        "step": 212000
     }
 }
