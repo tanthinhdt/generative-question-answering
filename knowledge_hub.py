@@ -55,6 +55,9 @@ class KnowledgeHub:
         Returns:
             list: A list of k supporting documents.
         """
+        if top_k == 0:
+            return []
+
         src = self.configs['src']
         question_embedding = str(self.encode(question))
         metric_dict = {

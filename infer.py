@@ -92,7 +92,7 @@ class Inference():
                 The question to be answered.
         """
         top_k = self.configs['num_support_documents']
-        support_documents = None
+        support_documents = []
         if top_k > 0:
             support_documents = self.knowledge_hub.query(question, top_k)
         encoder_inputs = self.process_question(question, support_documents)

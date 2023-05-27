@@ -11,6 +11,6 @@
         "entry": "20230504E002",
         "step": 212000
     },
-    "num_support_documents": 3,
+    "num_support_documents": 0,
     "knowledge_hub": "configs/knowledge_hub.json"
 }

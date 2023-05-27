@@ -136,9 +136,9 @@ class DataProcessor:
         Returns:
             dict: The processed sample.
         """
-        question = 'Question: '
+        question = 'Answer this question: '
         question += remove_redundant_spaces(sample['question'])
-        question += ', Context: '
+        question += ', with the context: '
         question += ', '.join([remove_redundant_spaces(c)
                                for c in sample['ctxs']])
 

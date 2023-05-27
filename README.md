@@ -78,3 +78,6 @@ python3 knowledge_hub.py -n 1000000
 
 ## Storing and searching vectors based on similarity
 To see how I use `pgvector` and `Postgresql` to store and search vectors by using some common methods to compute similarity, checkout [pqvector guide](https://github.com/pgvector/pgvector) and [here](/knowledge_hub.py).
+
+# Results
+
